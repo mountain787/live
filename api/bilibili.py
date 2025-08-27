@@ -26,7 +26,14 @@ def bilibili(path):
         print('BILIBILI_RESP:', status_json)
         if request.args.get('debug') == '1':
             return jsonify(status_json)
-        if status_json.get('code') != 0 or status_json.get('data', {}).get('live_status', 0) != 1:
+        data = status_json.get('data', {})
+        if status_json.get('code') != 0:
+            return ('Bilibili 接口返回错误', 500)
+        if data.get('room_shield') == 1:
+            if request.args.get('debug') == '1':
+                return jsonify({'error': 'room_shield', 'status': status_json})
+            return ('房间被屏蔽', 403)
+        if data.get('live_status', 0) != 1:
             return ('未开播或直播间不存在', 404)
         url = f"https://api.live.bilibili.com/xlive/play-gateway/master/url?cid={rid}&mid=17335468&pt=h5"
         return redirect(url)
