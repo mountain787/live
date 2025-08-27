@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
     const crypto = require('crypto');
     const rb = crypto.createHash('md5').update(realRid + did + t10 + v).digest('hex');
 
-    let func_sign = result.replace(/return rt;}\\);?/, 'return rt;}');
+    let func_sign = result.replace(/return rt;\}\);?/, 'return rt;}');
     func_sign = func_sign.replace('(function (', 'function sign(').replace('CryptoJS.MD5(cb).toString()', '"' + rb + '"');
 
     try {
