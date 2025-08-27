@@ -1,22 +1,25 @@
+from flask import Flask, redirect, request
 import requests
 import hashlib
 import time
 import urllib.parse
 import base64
+import re
 
+app = Flask(__name__)
 
-def handler(request):
-    query = request.query
-    rid = query.get('rid') or request.headers.get('rid')
+@app.route('/', methods=['GET','POST'])
+def huya():
+    rid = request.args.get('rid') or request.headers.get('rid')
     if not rid:
-        return (400, '房间号缺失')
+        return ('房间号缺失', 400)
     try:
         url = f"https://mp.huya.com/cache.php?m=Live&do=profileRoom&roomid={rid}"
         headers = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X)"}
         resp = requests.get(url, headers=headers, timeout=5).json()
         data = resp.get("data", {})
         if not isinstance(data, dict):
-            return (404, '未找到房间')
+            return ('未找到房间', 404)
         stream = data.get("stream", {})
         streams = stream.get("baseSteamInfoList", [])
         for item in streams:
@@ -26,7 +29,7 @@ def handler(request):
                 stream_name = item.get("sStreamName", "")
                 anti_code = item.get("sFlvAntiCode", "")
                 if base_url and suffix and stream_name and anti_code:
-                    params = dict(__import__('re').findall(r"([^=&]+)=([^&]*)", anti_code))
+                    params = dict(re.findall(r"([^=&]+)=([^&]*)", anti_code))
                     params["ctype"] = "huya_commserver"
                     params["fs"] = "gct"
                     params["t"] = "264"
@@ -43,7 +46,7 @@ def handler(request):
                         params["u"] = "0"
                     params.pop("fm", None)
                     new_anti_code = "&".join(f"{k}={v}" for k, v in params.items())
-                    return {'statusCode': 302, 'headers': {'Location': f"{base_url}/{stream_name}.{suffix}?{new_anti_code}"}}
-        return (404, '未找到合适的CDN')
+                    return redirect(f"{base_url}/{stream_name}.{suffix}?{new_anti_code}")
+        return ('未找到合适的CDN', 404)
     except Exception as e:
-        return (500, str(e))
+        return (str(e), 500)

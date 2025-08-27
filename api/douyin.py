@@ -21,3 +21,4 @@ def douyin():
         return redirect(pull)
     except Exception as e:
         return (str(e), 500)
+
