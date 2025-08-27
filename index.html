@@ -2,8 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>直播聚合演示</title>
+  <title>直播聚合演示平台</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 2rem; background: #f8f8f8; }
     h1 { color: #2a82e4; }
@@ -11,6 +10,7 @@
     .api-list li { margin-bottom: 1rem; }
     .api-list a { color: #333; text-decoration: none; }
     .api-list a:hover { color: #2a82e4; text-decoration: underline; }
+    .tip { margin-top: 2rem; color: #888; }
   </style>
 </head>
 <body>
@@ -23,6 +23,15 @@
     <li><a href="/bilibili/123456">B站房间号演示（/bilibili/123456）</a></li>
     <li><a href="/yy/123456">YY房间号演示（/yy/123456）</a></li>
   </ul>
-  <p>请将链接中的房间号替换为你想查询的房间号。</p>
+  <div class="tip">
+    <p>请将链接中的房间号替换为你想查询的房间号。</p>
+    <p>API 路由示例（支持 GET）：<br>
+    <code>/douyin/{room_id}</code><br>
+    <code>/douyu/{rid}</code><br>
+    <code>/huya/{rid}</code><br>
+    <code>/bilibili/{rid}</code><br>
+    <code>/yy/{rid}</code>
+    </p>
+  </div>
 </body>
 </html>
