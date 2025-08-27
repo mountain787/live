@@ -7,10 +7,11 @@
   ],
   "routes": [
     { "src": "/", "dest": "/index.html" },
-    { "src": "/douyin/(?<room_id>[^/]+)", "dest": "/api/douyin.py?room_id=$room_id" },
-    { "src": "/douyu/(?<rid>[^/]+)", "dest": "/api/douyu.js?rid=$rid" },
-    { "src": "/huya/(?<rid>[^/]+)", "dest": "/api/huya.py?rid=$rid" },
-    { "src": "/bilibili/(?<rid>[^/]+)", "dest": "/api/bilibili.py?rid=$rid" },
-    { "src": "/yy/(?<rid>[^/]+)", "dest": "/api/yy.py?rid=$rid" }
+    { "src": "/douyin/(?<room_id>[^/]+)", "dest": "/api/douyin.py" },
+    { "src": "/douyu/(?<rid>[^/]+)", "dest": "/api/douyu.js" },
+    { "src": "/huya/(?<rid>[^/]+)", "dest": "/api/huya.py" },
+    { "src": "/bilibili/(?<rid>[^/]+)", "dest": "/api/bilibili.py" },
+    { "src": "/yy/(?<rid>[^/]+)", "dest": "/api/yy.py" }
   ]
 }
+
