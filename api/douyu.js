@@ -37,6 +37,7 @@ module.exports = async (req, res) => {
       return res.status(500).send('执行签名JS失败: ' + (e && e.message || String(e)));
     }
     const result = sandbox.result;
+    console.log('VM_RESULT', String(result).slice(0,500));
     if (!result) {
       console.error('VM_NO_RESULT', { funcStrSnippet: funcStr.slice(0,1000) });
       return res.status(500).send('签名JS返回空');
