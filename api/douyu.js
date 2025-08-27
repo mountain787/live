@@ -65,15 +65,15 @@ module.exports = async (req, res) => {
       await page.setUserAgent(req.headers['user-agent'] || 'Mozilla/5.0');
       await page.goto(`https://www.douyu.com/${rid}`, { waitUntil: 'networkidle2', timeout: 15000 });
       // Evaluate ub98484234 in browser context
-      const result = await page.evaluate(() => {
+      const pResult = await page.evaluate(() => {
         try { return typeof ub98484234 === 'function' ? ub98484234() : null; } catch(e) { return {error: String(e)} }
       });
       await browser.close();
-      if (!result) return res.status(500).send('签名JS返回空');
-      if (result && result.error) return res.status(500).send('Puppeteer eval error: ' + result.error);
-      console.log('PUPPETEER_RESULT', String(result).slice(0,1000));
+      if (!pResult) return res.status(500).send('签名JS返回空');
+      if (pResult && pResult.error) return res.status(500).send('Puppeteer eval error: ' + pResult.error);
+      console.log('PUPPETEER_RESULT', String(pResult).slice(0,1000));
       // use result below (assign to resultStr to keep rest of code compatible)
-      var resultStr = String(result);
+      var resultStr = String(pResult);
     } catch (e) {
       console.error('PUPPETEER_ERROR', e && e.stack || String(e));
       return res.status(500).send('Puppeteer执行失败: ' + (e && e.message || String(e)));
