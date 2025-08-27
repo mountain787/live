@@ -1,4 +1,4 @@
-from flask import Flask, redirect, request
+from flask import Flask, redirect, request, jsonify
 import requests
 import hashlib
 import time
@@ -8,15 +8,24 @@ import re
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET','POST'])
-def huya():
+@app.route('/', defaults={'path': ''}, methods=['GET','POST'])
+@app.route('/<path:path>', methods=['GET','POST'])
+def huya(path):
     rid = request.args.get('rid') or request.headers.get('rid')
+    if not rid:
+        m = re.search(r'/huya/(\d+)', request.path)
+        if m:
+            rid = m.group(1)
     if not rid:
         return ('房间号缺失', 400)
     try:
+        print('PATH:', request.path, 'ARGS:', dict(request.args))
         url = f"https://mp.huya.com/cache.php?m=Live&do=profileRoom&roomid={rid}"
         headers = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X)"}
         resp = requests.get(url, headers=headers, timeout=5).json()
+        print('HUYA_RESP:', resp)
+        if request.args.get('debug') == '1':
+            return jsonify(resp)
         data = resp.get("data", {})
         if not isinstance(data, dict):
             return ('未找到房间', 404)
