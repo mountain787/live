@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
       if (pResult && pResult.error) return res.status(500).send('Puppeteer eval error: ' + pResult.error);
       console.log('PUPPETEER_RESULT', String(pResult).slice(0,1000));
       // use result below (assign to resultStr to keep rest of code compatible)
-      var resultStr = String(pResult);
+      resultStr = String(pResult);
     } catch (e) {
       console.error('PUPPETEER_ERROR', e && e.stack || String(e));
       return res.status(500).send('Puppeteer执行失败: ' + (e && e.message || String(e)));
@@ -84,7 +84,7 @@ module.exports = async (req, res) => {
 
     // Prefer generating params by executing the sign function (more reliable)
     let params = null;
-    const resultStr = String(result || '');
+    let resultStr = String(result || '');
 
     const vMatch0 = resultStr.match(/v=(\d+)/);
     const v0 = vMatch0 ? vMatch0[1] : '';
