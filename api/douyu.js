@@ -46,7 +46,6 @@ module.exports = async (req, res) => {
     const v = vMatch ? vMatch[1] : null;
     const did = '10000000000000000000000000001501';
     const t10 = String(Math.floor(Date.now() / 1000));
-    const crypto = require('crypto');
     const rb = crypto.createHash('md5').update(rid + did + t10 + v).digest('hex');
 
     let func_sign = result.replace(/return rt;}\)\;?/, 'return rt;}');
