@@ -22,10 +22,14 @@ module.exports = async (req, res) => {
     try {
       vm.runInContext(funcStr + '\n;result = typeof ub98484234 === "function" ? ub98484234() : null;', sandbox, { timeout: 2000 });
     } catch (e) {
-      return res.status(500).send('执行签名JS失败');
+      console.error('VM_ERROR_FUNCSTR', e && e.stack || String(e));
+      return res.status(500).send('执行签名JS失败: ' + (e && e.message || String(e)));
     }
     const result = sandbox.result;
-    if (!result) return res.status(500).send('签名JS返回空');
+    if (!result) {
+      console.error('VM_NO_RESULT', { funcStrSnippet: funcStr.slice(0,1000) });
+      return res.status(500).send('签名JS返回空');
+    }
 
     const vMatch = result.match(/v=(\d+)/);
     const v = vMatch ? vMatch[1] : null;
