@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "node-fetch": "^2.6.7",
-    "jsdom": "^22.1.0"
+    "jsdom": "^22.1.0",
+    "crypto-js": "^4.1.1"
   }
 }
