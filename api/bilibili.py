@@ -1,19 +1,33 @@
-from flask import Flask, redirect, request
+from flask import Flask, redirect, request, jsonify
 import requests
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET','POST'])
-def bilibili():
+@app.route('/', defaults={'path': ''}, methods=['GET','POST'])
+@app.route('/<path:path>', methods=['GET','POST'])
+def bilibili(path):
     rid = request.args.get('rid') or request.headers.get('rid')
-    if not rid or not rid.isdigit():
+    if not rid:
+        import re
+        m = re.search(r'/bilibili/(\d+)', request.path)
+        if m:
+            rid = m.group(1)
+    if not rid:
         return ('房间号非法', 400)
     try:
+        print('PATH:', request.path, 'ARGS:', dict(request.args))
         headers = {"User-Agent": "Mozilla/5.0"}
-        status_resp = requests.get(f"https://api.live.bilibili.com/room/v1/Room/room_init?id={rid}", headers=headers, timeout=2)
-        status_json = status_resp.json()
+        status_resp = requests.get(f"https://api.live.bilibili.com/room/v1/Room/room_init?id={rid}", headers=headers, timeout=5)
+        try:
+            status_json = status_resp.json()
+        except Exception as e:
+            print('BILIBILI_API_INVALID_JSON', status_resp.text)
+            return (str(e), 500)
+        print('BILIBILI_RESP:', status_json)
+        if request.args.get('debug') == '1':
+            return jsonify(status_json)
         if status_json.get('code') != 0 or status_json.get('data', {}).get('live_status', 0) != 1:
-            return ('未开播', 404)
+            return ('未开播或直播间不存在', 404)
         url = f"https://api.live.bilibili.com/xlive/play-gateway/master/url?cid={rid}&mid=17335468&pt=h5"
         return redirect(url)
     except Exception as e:

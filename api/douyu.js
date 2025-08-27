@@ -3,7 +3,8 @@ const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 
 module.exports = async (req, res) => {
-  const rid = req.query.rid || req.headers.rid;
+  const rid = req.query.rid || req.headers.rid || (req.url && (req.url.match(/\/douyu\/([^?\/]+)/) || [])[1]);
+  console.log('REQ.URL', req.url, 'QUERY', req.query, 'HEADERS', req.headers);
   if (!rid) return res.status(400).send('房间号缺失');
   try {
     const resp = await fetch(`https://www.douyu.com/${rid}`, { headers: { 'User-Agent': 'Mozilla/5.0' } });
