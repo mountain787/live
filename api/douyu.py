@@ -11,9 +11,9 @@ class DouYu:
     def __init__(self, rid):
         self.did = '10000000000000000000000000001501'
         self.t10 = str(int(time.time()))
-        self. = requests.Session()   # ✅ 正确写法
+        self.s = requests.Session()   # ✅ 正确写法
 
-        res = self..get(f'https://www.douyu.com/{rid}').text
+        res = self.s.get(f'https://www.douyu.com/{rid}').text
         match = re.search(r'ROOM\.room_id\s*=\s*(\d+);', res)
         if match:
             self.rid = match.group(1)
@@ -45,7 +45,7 @@ class DouYu:
         params = js.call('sign', self.rid, self.did, self.t10) + f'&cdn={cdn}&rate={rate}'
 
         url = f'https://playweb.douyu.com/lapi/live/getH5Play/{self.rid}'
-        return self..post(url, params=params).json()
+        return self.s.post(url, params=params).json()
 
     def get_real_url(self):
         res = self.get_pc_js()
