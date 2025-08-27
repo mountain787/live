@@ -2,19 +2,13 @@
   "version": 2,
   "builds": [
     { "src": "index.html", "use": "@vercel/static" },
-    { "src": "api/*.py", "use": "@vercel/python" },
-    { "src": "api/douyu.js", "use": "@vercel/node" }
+    { "src": "api/*.py", "use": "@vercel/python" }
   ],
   "routes": [
     { "src": "/douyin/(?<room_id>[^/]+)", "dest": "/api/douyin.py" },
-    { "src": "/douyu/(?<rid>[^/]+)", "dest": "/api/douyu.js" },
+    { "src": "/douyu/(?<rid>[^/]+)", "dest": "/api/douyu.py" },
     { "src": "/huya/(?<rid>[^/]+)", "dest": "/api/huya.py" },
     { "src": "/bilibili/(?<rid>[^/]+)", "dest": "/api/bilibili.py" },
     { "src": "/yy/(?<rid>[^/]+)", "dest": "/api/yy.py" }
   ]
 }
-
-
-
-
-
