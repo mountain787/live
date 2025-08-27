@@ -17,7 +17,18 @@ module.exports = async (req, res) => {
     const funcStr = funcMatch[1].replace(/eval.*?;}/, 'strc;}');
 
     const vm = require('vm');
-    const sandbox = { window: {}, document: {}, console };
+    const crypto = require('crypto');
+    const CryptoJS = require('crypto-js');
+    const sandbox = {
+      window: {},
+      document: {},
+      console,
+      atob: (s) => Buffer.from(s, 'base64').toString('binary'),
+      btoa: (s) => Buffer.from(String(s), 'binary').toString('base64'),
+      location: { href: `https://www.douyu.com/${rid}` },
+      navigator: { userAgent: req.headers['user-agent'] || '' },
+      CryptoJS
+    };
     vm.createContext(sandbox);
     try {
       vm.runInContext(funcStr + '\n;result = typeof ub98484234 === "function" ? ub98484234() : null;', sandbox, { timeout: 2000 });
