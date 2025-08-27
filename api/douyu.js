@@ -75,31 +75,30 @@ module.exports = async (req, res) => {
     const did = '10000000000000000000000000001501';
     const t10 = String(Math.floor(Date.now() / 1000));
 
-    // If ub98484234 already returned a params string (starts with v=), use it directly
+    // Prefer generating params by executing the sign function (more reliable)
     let params = null;
-    if (typeof result === 'string' && result.trim().startsWith('v=')) {
-      params = result;
-      // patch undefined placeholders if present
-      params = params.replace(/did=undefined/, 'did=' + did).replace(/tt=undefined/, 'tt=' + t10);
-      console.log('USING_RESULT_AS_PARAMS', params.slice(0,200));
-    } else {
-      const vMatch = String(result).match(/v=(\d+)/);
-      const v = vMatch ? vMatch[1] : '';
-      const rb = crypto.createHash('md5').update(rid + did + t10 + v).digest('hex');
+    const resultStr = String(result || '');
 
-      let func_sign = String(result).replace(/return rt;\}\)\;?/, 'return rt;}');
-      func_sign = func_sign.replace('(function (', 'function sign(').replace('CryptoJS.MD5(cb).toString()', '"' + rb + '"');
+    const vMatch0 = resultStr.match(/v=(\d+)/);
+    const v0 = vMatch0 ? vMatch0[1] : '';
+    const rb0 = crypto.createHash('md5').update(rid + did + t10 + v0).digest('hex');
 
-      // run sign function
-      try {
-        vm.runInContext(func_sign + '\n;params = typeof sign === "function" ? sign("' + rid + '","' + did + '","' + t10 + '") : null;', sandbox, { timeout: 5000 });
-      } catch (e) {
-        console.error('VM_ERROR_SIGN', e && e.stack || String(e));
-        return res.status(500).send('生成参数失败: ' + (e && e.message || String(e)));
-      }
+    let func_sign0 = resultStr.replace(/return rt;\}\)\;?/, 'return rt;}');
+    func_sign0 = func_sign0.replace('(function (', 'function sign(').replace('CryptoJS.MD5(cb).toString()', '"' + rb0 + '"');
 
+    try {
+      vm.runInContext(func_sign0 + '\n;params = typeof sign === "function" ? sign("' + rid + '","' + did + '","' + t10 + '") : null;', sandbox, { timeout: 5000 });
       params = sandbox.params;
       console.log('VM_PARAMS', String(params || '').slice(0,500));
+    } catch (e) {
+      console.error('VM_ERROR_SIGN_PRIMARY', e && e.stack || String(e));
+      // Fallback: if ub98484234 returned a direct params string, patch and use it
+      if (resultStr.trim().startsWith('v=')) {
+        params = resultStr.replace(/did=undefined/, 'did=' + did).replace(/tt=undefined/, 'tt=' + t10);
+        console.log('FALLBACK_USING_RESULT_AS_PARAMS', params.slice(0,200));
+      } else {
+        return res.status(500).send('生成参数失败: ' + (e && e.message || String(e)));
+      }
     }
 
     if (!params) {
