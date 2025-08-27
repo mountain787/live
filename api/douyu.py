@@ -76,7 +76,7 @@ class handler(BaseHTTPRequestHandler):
         if not rid or not rid.isdigit():
             self.send_response(400)
             self.end_headers()
-            self.wfile.write(b"缺少或非法 rid 参数")
+            self.wfile.write("缺少或非法 rid 参数".encode("utf-8"))
             return
 
         try:
