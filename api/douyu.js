@@ -59,8 +59,15 @@ module.exports = async (req, res) => {
 
     // Prefer using Puppeteer to run the page JS in a real browser context to obtain reliable params
     try {
-      const puppeteer = require('puppeteer');
-      const browser = await puppeteer.launch({args:['--no-sandbox','--disable-setuid-sandbox']});
+      const chromium = require('chrome-aws-lambda');
+      const puppeteer = require('puppeteer-core');
+      const execPath = await chromium.executablePath;
+      const browser = await puppeteer.launch({
+        args: chromium.args.concat(['--no-sandbox','--disable-setuid-sandbox']),
+        defaultViewport: chromium.defaultViewport,
+        executablePath: execPath || '/usr/bin/chromium-browser',
+        headless: chromium.headless
+      });
       const page = await browser.newPage();
       await page.setUserAgent(req.headers['user-agent'] || 'Mozilla/5.0');
       await page.goto(`https://www.douyu.com/${rid}`, { waitUntil: 'networkidle2', timeout: 15000 });
