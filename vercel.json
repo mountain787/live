@@ -5,6 +5,7 @@
     { "src": "api/douyu.js", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/", "dest": "/index.html" },
     { "src": "/douyin/(?<room_id>[^/]+)", "dest": "/api/douyin.py?room_id=$room_id" },
     { "src": "/douyu/(?<rid>[^/]+)", "dest": "/api/douyu.js?rid=$rid" },
     { "src": "/huya/(?<rid>[^/]+)", "dest": "/api/huya.py?rid=$rid" },
