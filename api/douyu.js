@@ -57,19 +57,26 @@ module.exports = async (req, res) => {
     };
     vm.createContext(sandbox);
 
-    // Run ub98484234 to get result
+    // Prefer using Puppeteer to run the page JS in a real browser context to obtain reliable params
     try {
-      vm.runInContext(funcStr + '\n;result = typeof ub98484234 === "function" ? ub98484234() : null;', sandbox, { timeout: 5000 });
+      const puppeteer = require('puppeteer');
+      const browser = await puppeteer.launch({args:['--no-sandbox','--disable-setuid-sandbox']});
+      const page = await browser.newPage();
+      await page.setUserAgent(req.headers['user-agent'] || 'Mozilla/5.0');
+      await page.goto(`https://www.douyu.com/${rid}`, { waitUntil: 'networkidle2', timeout: 15000 });
+      // Evaluate ub98484234 in browser context
+      const result = await page.evaluate(() => {
+        try { return typeof ub98484234 === 'function' ? ub98484234() : null; } catch(e) { return {error: String(e)} }
+      });
+      await browser.close();
+      if (!result) return res.status(500).send('签名JS返回空');
+      if (result && result.error) return res.status(500).send('Puppeteer eval error: ' + result.error);
+      console.log('PUPPETEER_RESULT', String(result).slice(0,1000));
+      // use result below (assign to resultStr to keep rest of code compatible)
+      var resultStr = String(result);
     } catch (e) {
-      console.error('VM_ERROR_FUNCSTR', e && e.stack || String(e));
-      return res.status(500).send('执行签名JS失败: ' + (e && e.message || String(e)));
-    }
-
-    const result = sandbox.result;
-    console.log('VM_RESULT', String(result || '').slice(0, 1000));
-    if (!result) {
-      console.error('VM_NO_RESULT', { funcStrSnippet: funcStr.slice(0,1000) });
-      return res.status(500).send('签名JS返回空');
+      console.error('PUPPETEER_ERROR', e && e.stack || String(e));
+      return res.status(500).send('Puppeteer执行失败: ' + (e && e.message || String(e)));
     }
 
     const did = '10000000000000000000000000001501';
