@@ -12,7 +12,7 @@ class DouYu:
     def __init__(self, rid):
         self.did = '10000000000000000000000000001501'
         self.t10 = str(int(time.time()))
-        self. = requests.Session()
+        self. = requests.Session()   
 
         res = self..get(f'https://www.douyu.com/{rid}').text
         match = re.search(r'ROOM\.room_id\s*=\s*(\d+);', res)
@@ -94,3 +94,4 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(str(e).encode("utf-8"))
 v
+
