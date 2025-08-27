@@ -1,18 +1,17 @@
 from http.server import BaseHTTPRequestHandler
 import re, time, hashlib, requests, execjs
 
-# 确认 execjs 能找到 Node.js
+# 检查 Node.js
 try:
     execjs.get("Node")
 except execjs.RuntimeUnavailableError:
     raise RuntimeError("没有检测到 Node.js，请确认 Vercel 环境支持 Node")
 
-# ---------------- DouYu 类 ----------------
 class DouYu:
     def __init__(self, rid):
         self.did = '10000000000000000000000000001501'
         self.t10 = str(int(time.time()))
-        self. = requests.Session()   
+        self. = requests.Session()   # ✅ 正确写法
 
         res = self..get(f'https://www.douyu.com/{rid}').text
         match = re.search(r'ROOM\.room_id\s*=\s*(\d+);', res)
@@ -70,7 +69,6 @@ class DouYu:
         return f"{data.get('rtmp_url','')}/{data.get('rtmp_live','')}?cdn={cdn}"
 
 
-# ---------------- Vercel handler ----------------
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         rid = self.path.strip("/").split("/")[-1]
@@ -93,5 +91,3 @@ class handler(BaseHTTPRequestHandler):
             self.send_response(500)
             self.end_headers()
             self.wfile.write(str(e).encode("utf-8"))
-v
-
